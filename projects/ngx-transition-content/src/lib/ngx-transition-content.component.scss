@@ -1,0 +1,13 @@
+:host {
+  overflow: hidden;
+}
+
+.delayed {
+  display: none;
+}
+
+.resizer {
+  will-change: height;
+  transition-property: height;
+  transition-timing-function: ease-out;
+}

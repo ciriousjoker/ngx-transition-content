@@ -1,0 +1,31 @@
+{
+  "name": "ngx-transition-content",
+  "description": "Switch between content: Fade out, transition height, fade in",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ciriousjoker/ngx-transition-content.git"
+  },
+  "keywords": [
+    "angular",
+    "animation",
+    "transition",
+    "fade",
+    "height",
+    "template",
+    "ng-content"
+  ],
+  "author": "Philipp Bauer",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ciriousjoker/ngx-transition-content/issues"
+  },
+  "homepage": "https://github.com/ciriousjoker/ngx-transition-content#readme",
+  "peerDependencies": {
+    "@angular/common": "^13.2.0",
+    "@angular/core": "^13.2.0"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  }
+}

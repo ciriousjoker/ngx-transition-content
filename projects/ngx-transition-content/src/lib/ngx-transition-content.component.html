@@ -1,0 +1,15 @@
+<!-- Transition between measured heights, set to auto once done. -->
+<div class="resizer" [style.transition-duration]="durationHeight + 'ms'"
+  [style.height]="height != undefined ? height + 'px' : 'auto'">
+  <!-- Used to measure height & width -->
+  <div #content>
+    <ng-container *ngFor="let tmpl of templates; index as i">
+      <!-- ngIf can't be added next to ngFor -->
+      <div *ngIf="slot == i" [@enter]="{value: ':enter', params: { duration: durationFade, delay: delayEnter }}"
+        [@leave]="{value: ':leave', params: { duration: durationFade }}"
+        [hidden]="(slot == i && !isEntering) || (slot != i && isEntering)">
+        <ng-container [ngTemplateOutlet]="tmpl"></ng-container>
+      </div>
+    </ng-container>
+  </div>
+</div>
