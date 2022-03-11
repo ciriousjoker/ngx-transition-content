@@ -17,7 +17,7 @@ jobs:
           node-version: 16
           registry-url: https://registry.npmjs.org/
       - run: npm ci
-      - run: cd ./dist/ngx-transition-content
       - run: npm publish
+        working-directory: ./dist/ngx-transition-content
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
