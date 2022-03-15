@@ -6,7 +6,16 @@
     border: 2px solid blue;
 
     section {
-      background-color: red;
+      display: flex;
+      flex-direction: column;
+
+      &.a {
+        background-color: red;
+      }
+
+      &.b {
+        background-color: green;
+      }
     }
   }
 }
