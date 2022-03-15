@@ -1,0 +1,12 @@
+.wrapper {
+  display: flex;
+
+  .container {
+    margin: auto;
+    border: 2px solid blue;
+
+    section {
+      background-color: red;
+    }
+  }
+}

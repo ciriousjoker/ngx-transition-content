@@ -1,17 +1,25 @@
-Slot: {{slot}}
-<ngx-transition-content [slot]="slot">
-  <ng-template ngx-transition-content-page>
-    <p>Content1</p>
-    <p>Content1</p>
-    <p>Content1</p>
-  </ng-template>
-  <ng-template ngx-transition-content-page>
-    <p>Content2</p>
-    <p>Content2</p>
-    <p>Content2</p>
-    <p>Content2</p>
-    <p>Content2</p>
-  </ng-template>
-</ngx-transition-content>
+<button (click)="slot = slot == 1 ? 0 : 1">Transition to slot {{slot == 1 ? 0 : 1}}</button>
 
-<button (click)="slot = slot == 1 ? 0 : 1">asd</button>
+<div class="wrapper">
+  <div class="container">
+    <ngx-transition-content [slot]="slot">
+      <ng-template ngx-transition-content-page>
+        <section>
+          <p>Content1</p>
+          <p>Content1</p>
+          <p>Content1</p>
+        </section>
+      </ng-template>
+      <ng-template ngx-transition-content-page>
+        <section>
+          <p>Content2Content2Content2Content2</p>
+          <p>Content2Content2Content2Content2</p>
+          <p>Content2Content2Content2Content2</p>
+          <p>Content2Content2Content2Content2</p>
+          <p>Content2Content2Content2Content2</p>
+          <p>Content2Content2Content2Content2</p>
+        </section>
+      </ng-template>
+    </ngx-transition-content>
+  </div>
+</div>
