@@ -7,7 +7,12 @@
 }
 
 .resizer {
+  position: relative;
   will-change: height;
   transition-property: height;
   transition-timing-function: ease-out;
+
+  .content {
+    display: flex;
+  }
 }

@@ -2,12 +2,13 @@
 <div class="resizer" [style.transition-duration]="durationHeight + 'ms'"
   [style.height]="height != undefined ? height + 'px' : 'auto'">
   <!-- Used to measure height & width -->
-  <div #content>
+  <div class="content" #content>
     <ng-container *ngFor="let tmpl of templates; index as i">
       <!-- ngIf can't be added next to ngFor -->
-      <div *ngIf="slot == i" [@enter]="{value: ':enter', params: { duration: durationFade, delay: delayEnter }}"
-        [@leave]="{value: ':leave', params: { duration: durationFade }}"
-        [hidden]="(slot == i && !isEntering) || (slot != i && isEntering)">
+      <div *ngIf="activeSlot == i" [@enter]="{value: ':enter', params: { duration: durationFade, delay: delayEnter }}"
+        (@enter.done)="onEnterDone($event)" [@leave]="{value: ':leave', params: { duration: durationFade }}"
+        (@leave.done)="onLeaveDone($event)">
+        <!-- Display the template here -->
         <ng-container [ngTemplateOutlet]="tmpl"></ng-container>
       </div>
     </ng-container>
