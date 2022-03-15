@@ -8,11 +8,14 @@
 
 .resizer {
   position: relative;
-  will-change: height;
-  transition-property: height;
+  will-change: height, width;
+  transition-property: height, width;
   transition-timing-function: ease-out;
 
-  .content {
+  .wrapperHeight,
+  .wrapperWidth {
+    // Without this, the transition would cause layout shifts if
+    // the content has margins. Also, width calculation would be completely broken.
     display: flex;
   }
 }

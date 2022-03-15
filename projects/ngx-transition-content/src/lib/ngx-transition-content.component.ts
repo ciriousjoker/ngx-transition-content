@@ -6,9 +6,10 @@ import {
   ElementRef,
   Input,
   OnChanges,
+  SimpleChange,
   SimpleChanges,
   TemplateRef,
-  ViewChild
+  ViewChild,
 } from "@angular/core";
 
 const defaultDurationFade = 300;
@@ -67,7 +68,10 @@ export class NgxTransitionContentComponent implements OnChanges {
   @ContentChildren(NgxTransitionContentPage, { read: TemplateRef }) templates: TemplateRef<unknown>[] = [];
 
   /** A wrapper around the content. It's used to measure the height that the content takes up. */
-  @ViewChild("content") content?: ElementRef;
+  @ViewChild("wrapperHeight") wrapperHeight?: ElementRef;
+
+  /** A wrapper around the content. It's used to measure the height that the content takes up. */
+  @ViewChild("wrapperWidth") wrapperWidth?: ElementRef;
 
   /** The index of the <ng-template> that's being transitioned to. */
   @Input() slot = 0;
@@ -81,11 +85,14 @@ export class NgxTransitionContentComponent implements OnChanges {
   /** undefined means auto, otherwise number in pixels. */
   public height: number | undefined = undefined;
 
+  /** undefined means auto, otherwise number in pixels. */
+  public width: number | undefined = undefined;
+
   /** We have to use a proxy property here since we need to measure the height before switching the content. */
   public activeSlot = this.slot;
 
   /** Ignore the first entry animation via this flag. */
-  private isLoaded = false;
+  public isLoaded = false;
 
   public get delayEnter() {
     return this.durationFade + this.durationHeight;
@@ -93,11 +100,16 @@ export class NgxTransitionContentComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     // We only need to do something here if the slot changes
-    if ((changes as unknown as NgxTransitionContentComponent).slot === undefined) return;
+    const changedSlot = (changes as unknown as NgxTransitionContentComponent).slot as unknown as SimpleChange;
+    if (changedSlot === undefined) return;
 
     // Ignore the first entry animation
-    if (!this.isLoaded) {
-      this.isLoaded = true;
+    if (changedSlot.firstChange) {
+      // This needs to be called delayed so the entry "animation"
+      // can complete.
+      requestAnimationFrame(() => {
+        this.isLoaded = true;
+      });
       return;
     }
 
@@ -111,6 +123,7 @@ export class NgxTransitionContentComponent implements OnChanges {
       // New content has completely entered the DOM and is visible.
       // The height also perfectly matches the new content, so we can restore the height to auto.
       this.height = undefined;
+      this.width = undefined;
     }
   }
   public onLeaveDone(evt: AnimationEvent) {
@@ -119,7 +132,8 @@ export class NgxTransitionContentComponent implements OnChanges {
       // Old content has completely left the DOM and the new content
       // already takes up space in the DOM (even though it's not visible yet due to the animation delay).
       // This transitions the height to the new content's height.
-      this.height = this.content?.nativeElement.clientHeight;
+      this.height = this.wrapperHeight?.nativeElement.clientHeight;
+      this.width = this.wrapperWidth?.nativeElement.clientWidth;
     }
   }
 
@@ -129,7 +143,8 @@ export class NgxTransitionContentComponent implements OnChanges {
   async startTransition() {
     // Save the current height of the content element
     // This is necessary to enable a smooth transition between different height values
-    this.height = this.content?.nativeElement.clientHeight;
+    this.height = this.wrapperHeight?.nativeElement.clientHeight;
+    this.width = this.wrapperWidth?.nativeElement.clientWidth;
 
     // Change the rendered slot after the height has been measured/saved
     this.activeSlot = this.slot;

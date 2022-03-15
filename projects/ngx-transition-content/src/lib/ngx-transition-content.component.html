@@ -1,16 +1,21 @@
 <!-- Transition between measured heights, set to auto once done. -->
 <div class="resizer" [style.transition-duration]="durationHeight + 'ms'"
-  [style.height]="height != undefined ? height + 'px' : 'auto'">
-  <!-- Used to measure height & width -->
-  <div class="content" #content>
-    <ng-container *ngFor="let tmpl of templates; index as i">
-      <!-- ngIf can't be added next to ngFor -->
-      <div *ngIf="activeSlot == i" [@enter]="{value: ':enter', params: { duration: durationFade, delay: delayEnter }}"
-        (@enter.done)="onEnterDone($event)" [@leave]="{value: ':leave', params: { duration: durationFade }}"
-        (@leave.done)="onLeaveDone($event)">
-        <!-- Display the template here -->
-        <ng-container [ngTemplateOutlet]="tmpl"></ng-container>
-      </div>
-    </ng-container>
+  [style.height]="height != undefined ? height + 'px' : 'auto'"
+  [style.width]="width != undefined ? width + 'px' : 'auto'">
+  <!-- Used to measure height -->
+  <div class="wrapperHeight" #wrapperHeight>
+    <!-- Used to measure width. Due to some obscure bug the browser doesn't update width properly on wrapperHeight -->
+    <div class="wrapperWidth" #wrapperWidth>
+      <ng-container *ngFor="let tmpl of templates; index as i">
+        <!-- ngIf can't be added next to ngFor -->
+        <div *ngIf="activeSlot == i" [@.disabled]="!isLoaded"
+          [@enter]="{value: ':enter', params: { duration: durationFade, delay: delayEnter }}"
+          (@enter.done)="onEnterDone($event)" [@leave]="{value: ':leave', params: { duration: durationFade }}"
+          (@leave.done)="onLeaveDone($event)">
+          <!-- Display the template here -->
+          <ng-container [ngTemplateOutlet]="tmpl"></ng-container>
+        </div>
+      </ng-container>
+    </div>
   </div>
 </div>
