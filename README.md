@@ -1,4 +1,6 @@
-# NgxTransitionContent
+# NgxTransitionContent <sub>[(changelog)](CHANGELOG.md)</sub>
+
+[![npm](https://img.shields.io/npm/l/ngx-transition-content.svg)](https://github.com/ciriousjoker/ngx-transition-content/blob/main/LICENSE)
 
 Switch between content: Fade out, transition height, fade in.
 
