@@ -1,3 +1,7 @@
+## [1.0.1] - 2022-03-16
+
+- Improve README
+
 ## [1.0.0] - 2022-03-16
 
 - Rewrite the height transition
