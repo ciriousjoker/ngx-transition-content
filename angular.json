@@ -33,6 +33,109 @@
           }
         }
       }
+    },
+    "ngx-transition-content-demo": {
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        },
+        "@schematics/angular:application": {
+          "strict": true
+        }
+      },
+      "root": "projects/ngx-transition-content-demo",
+      "sourceRoot": "projects/ngx-transition-content-demo/src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/ngx-transition-content-demo",
+            "index": "projects/ngx-transition-content-demo/src/index.html",
+            "main": "projects/ngx-transition-content-demo/src/main.ts",
+            "polyfills": "projects/ngx-transition-content-demo/src/polyfills.ts",
+            "tsConfig": "projects/ngx-transition-content-demo/tsconfig.app.json",
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              "projects/ngx-transition-content-demo/src/favicon.ico",
+              "projects/ngx-transition-content-demo/src/assets"
+            ],
+            "styles": [
+              "projects/ngx-transition-content-demo/src/styles.scss"
+            ],
+            "scripts": []
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kb",
+                  "maximumError": "1mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "2kb",
+                  "maximumError": "4kb"
+                }
+              ],
+              "fileReplacements": [
+                {
+                  "replace": "projects/ngx-transition-content-demo/src/environments/environment.ts",
+                  "with": "projects/ngx-transition-content-demo/src/environments/environment.prod.ts"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "buildOptimizer": false,
+              "optimization": false,
+              "vendorChunk": true,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "configurations": {
+            "production": {
+              "browserTarget": "ngx-transition-content-demo:build:production"
+            },
+            "development": {
+              "browserTarget": "ngx-transition-content-demo:build:development"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "ngx-transition-content-demo:build"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/ngx-transition-content-demo/src/test.ts",
+            "polyfills": "projects/ngx-transition-content-demo/src/polyfills.ts",
+            "tsConfig": "projects/ngx-transition-content-demo/tsconfig.spec.json",
+            "karmaConfig": "projects/ngx-transition-content-demo/karma.conf.js",
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              "projects/ngx-transition-content-demo/src/favicon.ico",
+              "projects/ngx-transition-content-demo/src/assets"
+            ],
+            "styles": [
+              "projects/ngx-transition-content-demo/src/styles.scss"
+            ],
+            "scripts": []
+          }
+        }
+      }
     }
   },
   "defaultProject": "ngx-transition-content"
