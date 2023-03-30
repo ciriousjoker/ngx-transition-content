@@ -1,7 +1,7 @@
 {
   "name": "ngx-transition-content",
   "description": "Transition content: Fade out, transition dimensions, fade in",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ciriousjoker/ngx-transition-content.git"

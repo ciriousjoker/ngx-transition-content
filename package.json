@@ -1,7 +1,7 @@
 {
   "name": "ngx-transition-content",
   "description": "Switch between content: Fade out, transition height, fade in",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",

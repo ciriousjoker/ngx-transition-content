@@ -1,3 +1,7 @@
+## [1.0.3] - 2023-03-31
+
+- Add compatibility with Angular >=13.0.0
+
 ## [1.0.2] - 2022-03-16
 
 - Add missing `overflow: hidden;`
