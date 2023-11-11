@@ -1,3 +1,7 @@
+## [1.0.6] - 2023-11-11
+
+- Fix ReferenceError: requestAnimationFrame is not defined
+
 ## [1.0.3] - 2023-03-31
 
 - Add compatibility with Angular >=13.0.0
