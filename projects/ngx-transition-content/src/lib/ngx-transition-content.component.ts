@@ -1,11 +1,14 @@
 import { animate, AnimationEvent, style, transition, trigger } from "@angular/animations";
+import { isPlatformBrowser } from "@angular/common";
 import {
   Component,
   ContentChildren,
   Directive,
   ElementRef,
+  Inject,
   Input,
   OnChanges,
+  PLATFORM_ID,
   SimpleChange,
   SimpleChanges,
   TemplateRef,
@@ -98,6 +101,8 @@ export class NgxTransitionContentComponent implements OnChanges {
     return this.durationFade + this.durationHeight;
   }
 
+  constructor(@Inject(PLATFORM_ID) private platformId: Record<string, unknown>) {}
+
   ngOnChanges(changes: SimpleChanges) {
     // We only need to do something here if the slot changes
     const changedSlot = (changes as unknown as NgxTransitionContentComponent).slot as unknown as SimpleChange;
@@ -105,6 +110,9 @@ export class NgxTransitionContentComponent implements OnChanges {
 
     // Ignore the first entry animation
     if (changedSlot.firstChange) {
+      // We can't use requestAnimationFrame during SSR.
+      if (!isPlatformBrowser(this.platformId)) return;
+
       // This needs to be called delayed so the entry "animation"
       // can complete.
       requestAnimationFrame(() => {
