@@ -4,8 +4,9 @@
     {
       "label": "Serve Website",
       "detail": "Serves the website on localhost. To debug, run \"Debug Website\" instead.",
-      "type": "npm",
-      "script": "start",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["start"],
       "isBackground": true,
       "presentation": {
         "focus": true,
@@ -14,6 +15,34 @@
       "group": {
         "kind": "build",
         "isDefault": true
+      },
+      "problemMatcher": {
+        "owner": "typescript",
+        "source": "ts",
+        "applyTo": "closedDocuments",
+        "fileLocation": ["relative", "${cwd}"],
+        "pattern": "$tsc",
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": {
+            "regexp": "(.*?)"
+          },
+          "endsPattern": {
+            "regexp": "Compiled |Failed to compile."
+          }
+        }
+      }
+    },
+    {
+      "label": "Test Website",
+      "detail": "Runs the test suite on localhost for debugging.",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["test"],
+      "isBackground": true,
+      "presentation": {
+        "focus": true,
+        "panel": "dedicated"
       },
       "problemMatcher": {
         "owner": "typescript",

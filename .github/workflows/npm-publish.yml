@@ -16,8 +16,9 @@ jobs:
         with:
           node-version: 16
           registry-url: https://registry.npmjs.org/
-      - run: npm ci
-      - run: npm publish
-        working-directory: ./dist/ngx-transition-content
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run prepublish
+      - run: pnpm --dir ./dist/ngx-transition-content publish --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
