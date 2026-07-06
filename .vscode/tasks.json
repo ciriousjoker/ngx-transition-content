@@ -3,7 +3,7 @@
   "tasks": [
     {
       "label": "Serve Website",
-      "detail": "Serves the website on localhost. To debug, run \"Debug Website\" instead.",
+      "detail": "Builds the library once and serves the demo app.",
       "type": "shell",
       "command": "pnpm",
       "args": ["start"],
@@ -28,38 +28,27 @@
             "regexp": "(.*?)"
           },
           "endsPattern": {
-            "regexp": "Compiled |Failed to compile."
+            "regexp": "Application bundle generation complete|Failed to compile."
           }
         }
       }
     },
     {
-      "label": "Test Website",
-      "detail": "Runs the test suite on localhost for debugging.",
+      "label": "Test",
+      "detail": "Runs the Vitest-backed Angular test suite.",
       "type": "shell",
       "command": "pnpm",
       "args": ["test"],
-      "isBackground": true,
       "presentation": {
         "focus": true,
         "panel": "dedicated"
       },
-      "problemMatcher": {
-        "owner": "typescript",
-        "source": "ts",
-        "applyTo": "closedDocuments",
-        "fileLocation": ["relative", "${cwd}"],
-        "pattern": "$tsc",
-        "background": {
-          "activeOnStart": true,
-          "beginsPattern": {
-            "regexp": "(.*?)"
-          },
-          "endsPattern": {
-            "regexp": "Compiled |Failed to compile."
-          }
-        }
-      }
+      "problemMatcher": "$tsc"
+    },
+    {
+      "label": "Reformat all files",
+      "type": "shell",
+      "command": "pnpm exec prettier --write --ignore-unknown ."
     }
   ]
 }

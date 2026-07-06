@@ -2,20 +2,39 @@
 
 [![npm](https://img.shields.io/npm/l/ngx-transition-content.svg)](https://github.com/ciriousjoker/ngx-transition-content/blob/main/LICENSE)
 
-Transition content: Fade out, transition dimensions, fade in.
+Transition content: fade out old content, transition dimensions, fade in new content.
 
 It was built for dialog content where the dialog width stays the same for every page of content.
-Read the caveats before using it.
 
-## Transition
+## Compatibility
 
-> Fade out old content -> transition dimensions to fit the new content -> fade in new content
+| Package version | Angular support    |
+| --------------- | ------------------ |
+| `2.x`           | `>=20.2.0 <23.0.0` |
+| `1.x`           | `>=13.0.0`         |
 
-### Demo
+Version 2 uses native CSS transitions instead of `@angular/animations`.
+
+## Demo
 
 https://user-images.githubusercontent.com/16866223/158490182-56702fef-d034-44f3-a71b-e5ad5bef87d7.mov
 
-## Usage:
+## Usage
+
+```ts
+import { Component } from "@angular/core";
+import { NgxTransitionContentComponent, NgxTransitionContentPage } from "ngx-transition-content";
+
+@Component({
+  selector: "app-dialog",
+  imports: [NgxTransitionContentComponent, NgxTransitionContentPage],
+  templateUrl: "./dialog.html",
+  standalone: true,
+})
+export class DialogComponent {
+  slot = 0;
+}
+```
 
 ```html
 <!--
@@ -24,18 +43,21 @@ https://user-images.githubusercontent.com/16866223/158490182-56702fef-d034-44f3-
     [durationFade]="300"
     [durationHeight]="300"
 -->
-<ngx-transition-content [slot]="0">
+<ngx-transition-content [slot]="slot">
   <ng-template ngx-transition-content-page>
-    <p>Content1</p>
-    <p>Content1</p>
-    <p>Content1</p>
+    <p>Content 1</p>
+    <p>Content 1</p>
+    <p>Content 1</p>
   </ng-template>
+
   <ng-template ngx-transition-content-page>
-    <p>Content2</p>
-    <p>Content2</p>
-    <p>Content2</p>
-    <p>Content2</p>
-    <p>Content2</p>
+    <p>Content 2</p>
+    <p>Content 2</p>
+    <p>Content 2</p>
+    <p>Content 2</p>
+    <p>Content 2</p>
   </ng-template>
 </ngx-transition-content>
 ```
+
+NgModule consumers can still import `NgxTransitionContentModule`.
