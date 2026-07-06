@@ -1,26 +1,26 @@
-<button (click)="slot = slot == 1 ? 0 : 1">Transition to slot {{slot == 1 ? 0 : 1}}</button>
-<br>
-<br>
-<div class="wrapper">
-  <div class="container">
-    <ngx-transition-content [slot]="slot">
+<main class="demo">
+  <button type="button" (click)="toggleSlot()">Transition to slot {{ slot() === 1 ? 0 : 1 }}</button>
+
+  <div class="panel">
+    <ngx-transition-content [slot]="slot()">
       <ng-template ngx-transition-content-page>
-        <section class="a">
-          <p>Content1</p>
-          <p>Content1</p>
-          <p>Content1</p>
+        <section class="page page-a">
+          <p>Content 1</p>
+          <p>Content 1</p>
+          <p>Content 1</p>
         </section>
       </ng-template>
+
       <ng-template ngx-transition-content-page>
-        <section class="b">
-          <p>Content2Content2Content2Content2</p>
-          <p>Content2Content2Content2Content2</p>
-          <p>Content2Content2Content2Content2</p>
-          <p>Content2Content2Content2Content2</p>
-          <p>Content2Content2Content2Content2</p>
-          <p>Content2Content2Content2Content2</p>
+        <section class="page page-b">
+          <p>Content 2 Content 2 Content 2 Content 2</p>
+          <p>Content 2 Content 2 Content 2 Content 2</p>
+          <p>Content 2 Content 2 Content 2 Content 2</p>
+          <p>Content 2 Content 2 Content 2 Content 2</p>
+          <p>Content 2 Content 2 Content 2 Content 2</p>
+          <p>Content 2 Content 2 Content 2 Content 2</p>
         </section>
       </ng-template>
     </ngx-transition-content>
   </div>
-</div>
+</main>

@@ -1,21 +1,49 @@
-.wrapper {
+:host {
+  display: block;
+  min-height: 100vh;
+}
+
+.demo {
+  display: grid;
+  min-height: 100vh;
+  place-content: center;
+  gap: 24px;
+  padding: 24px;
+}
+
+button {
+  justify-self: start;
+  border: 1px solid #222;
+  border-radius: 4px;
+  background: #fff;
+  color: #111;
+  cursor: pointer;
+  font: inherit;
+  padding: 8px 12px;
+}
+
+.panel {
+  width: min(100%, 360px);
+  border: 2px solid #1f4e8c;
+}
+
+.page {
   display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
 
-  .container {
-    margin: auto;
-    border: 2px solid blue;
-
-    section {
-      display: flex;
-      flex-direction: column;
-
-      &.a {
-        background-color: red;
-      }
-
-      &.b {
-        background-color: green;
-      }
-    }
+  p {
+    margin: 0;
   }
+}
+
+.page-a {
+  background-color: #d73838;
+  color: #fff;
+}
+
+.page-b {
+  background-color: #1f7a4d;
+  color: #fff;
 }
