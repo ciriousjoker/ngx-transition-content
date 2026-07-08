@@ -1,31 +1,36 @@
-import { TestBed } from '@angular/core/testing';
-import { AppComponent } from './app.component';
+import { provideZonelessChangeDetection } from "@angular/core";
+import { TestBed } from "@angular/core/testing";
+import { AppComponent } from "./app.component";
 
-describe('AppComponent', () => {
+describe("AppComponent", () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [
-        AppComponent
-      ],
+      imports: [AppComponent],
+      providers: [provideZonelessChangeDetection()],
     }).compileComponents();
   });
 
-  it('should create the app', () => {
+  it("creates the app", () => {
     const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app).toBeTruthy();
+
+    expect(fixture.componentInstance).toBeTruthy();
   });
 
-  it(`should have as title 'ngx-transition-content-demo'`, () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app.title).toEqual('ngx-transition-content-demo');
-  });
-
-  it('should render title', () => {
+  it("renders the first transition page by default", () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
+
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('.content span')?.textContent).toContain('ngx-transition-content-demo app is running!');
+    expect(compiled.textContent).toContain("Content 1");
+  });
+
+  it("toggles to the second transition page", () => {
+    const fixture = TestBed.createComponent(AppComponent);
+
+    fixture.componentInstance.toggleSlot();
+    fixture.detectChanges();
+
+    const compiled = fixture.nativeElement as HTMLElement;
+    expect(compiled.textContent).toContain("Content 2");
   });
 });

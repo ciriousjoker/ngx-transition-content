@@ -1,3 +1,11 @@
+## [2.0.0] - 2026-07-06
+
+- Require Angular >=20.2.0.
+- Replace `@angular/animations` with native CSS-based transitions.
+- Add standalone component/directive exports while keeping the NgModule wrapper.
+- Move the workspace to Angular 20.2, Node 22, PNPM, and Vitest.
+- Modernize the demo app and GitHub Actions workflows.
+
 ## [1.0.6] - 2023-11-11
 
 - Fix ReferenceError: requestAnimationFrame is not defined

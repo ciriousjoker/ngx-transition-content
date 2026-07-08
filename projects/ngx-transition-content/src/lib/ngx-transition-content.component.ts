@@ -1,18 +1,18 @@
-import { animate, AnimationEvent, style, transition, trigger } from "@angular/animations";
-import { isPlatformBrowser } from "@angular/common";
+import { CommonModule, isPlatformBrowser } from "@angular/common";
 import {
+  computed,
   Component,
-  ContentChildren,
+  contentChildren,
   Directive,
   ElementRef,
-  Inject,
-  Input,
-  OnChanges,
+  effect,
+  inject,
+  input,
   PLATFORM_ID,
-  SimpleChange,
-  SimpleChanges,
+  signal,
   TemplateRef,
-  ViewChild,
+  untracked,
+  viewChild,
 } from "@angular/core";
 
 const defaultDurationFade = 300;
@@ -21,140 +21,148 @@ const defaultDurationHeight = 300;
 /**
  * Mark each child <ng-template> with this directive to enable transitions.
  */
-@Directive({ selector: "[ngx-transition-content-page]" })
+@Directive({
+  selector: "[ngx-transition-content-page]",
+  standalone: true,
+})
 export class NgxTransitionContentPage {}
 
 /**
  * Transition between content elements.
  * Transition:
- * - lock current height
+ * - lock current dimensions
  * - fade out existing content
- * - transition height to the measured height of the new content
+ * - transition dimensions to the measured dimensions of the new content
  * - fade in new content
- * - restore height to auto
+ * - restore dimensions to auto
  */
 @Component({
   selector: "ngx-transition-content",
+  imports: [CommonModule],
   templateUrl: "./ngx-transition-content.component.html",
   styleUrls: ["./ngx-transition-content.component.scss"],
-  animations: [
-    trigger("enter", [
-      transition(":enter", [style({ opacity: 0 }), animate("{{duration}}ms {{delay}}ms ease-out", style({ opacity: 1 }))], {
-        params: {
-          duration: defaultDurationFade,
-          /** The delay after which the fade starts. The element already takes up space before this delay is over! */
-          delay: defaultDurationFade + defaultDurationHeight,
-        },
-      }),
-    ]),
-    trigger("leave", [
-      transition(
-        ":leave",
-        [
-          style({
-            opacity: 1,
-            // Since the incoming element already takes up space, we need to set the old one to absolute.
-            // This prevents layout shift due to both elements taking up space within #content.
-            position: "absolute",
-          }),
-          animate("{{duration}}ms ease-in", style({ opacity: 0 })),
-        ],
-        {
-          params: { duration: defaultDurationFade },
-        }
-      ),
-    ]),
-  ],
+  standalone: true,
 })
-export class NgxTransitionContentComponent implements OnChanges {
+export class NgxTransitionContentComponent {
   /** A list of templates that should be transitioned between. */
-  @ContentChildren(NgxTransitionContentPage, { read: TemplateRef }) templates: TemplateRef<unknown>[] = [];
+  protected readonly templates = contentChildren(NgxTransitionContentPage, { read: TemplateRef });
 
-  /** A wrapper around the content. It's used to measure the height that the content takes up. */
-  @ViewChild("wrapperHeight") wrapperHeight?: ElementRef;
+  /** A wrapper around the content. It is used to measure the height that the content takes up. */
+  protected readonly wrapperHeight = viewChild<ElementRef<HTMLElement>>("wrapperHeight");
 
-  /** A wrapper around the content. It's used to measure the height that the content takes up. */
-  @ViewChild("wrapperWidth") wrapperWidth?: ElementRef;
+  /** A wrapper around the content. It is used to measure the width that the content takes up. */
+  protected readonly wrapperWidth = viewChild<ElementRef<HTMLElement>>("wrapperWidth");
 
-  /** The index of the <ng-template> that's being transitioned to. */
-  @Input() slot = 0;
+  /** The index of the <ng-template> that is being transitioned to. */
+  public readonly slot = input(0);
 
-  /** Duration in milliseconds. */
-  @Input() durationFade = defaultDurationFade;
+  /** Fade duration in milliseconds. */
+  public readonly durationFade = input(defaultDurationFade);
 
-  /** Duration in milliseconds. */
-  @Input() durationHeight = defaultDurationHeight;
-
-  /** undefined means auto, otherwise number in pixels. */
-  public height: number | undefined = undefined;
+  /** Dimension transition duration in milliseconds. */
+  public readonly durationHeight = input(defaultDurationHeight);
 
   /** undefined means auto, otherwise number in pixels. */
-  public width: number | undefined = undefined;
+  private readonly heightState = signal<number | undefined>(undefined);
+  protected readonly height = this.heightState.asReadonly();
 
-  /** We have to use a proxy property here since we need to measure the height before switching the content. */
-  public activeSlot = this.slot;
+  /** undefined means auto, otherwise number in pixels. */
+  private readonly widthState = signal<number | undefined>(undefined);
+  protected readonly width = this.widthState.asReadonly();
 
-  /** Ignore the first entry animation via this flag. */
-  public isLoaded = false;
+  /** We use a proxy property because dimensions must be measured before switching content. */
+  private readonly activeSlot = signal(this.slot());
 
-  public get delayEnter() {
-    return this.durationFade + this.durationHeight;
-  }
+  /** The previous slot stays mounted while it fades out. */
+  private readonly leavingSlot = signal<number | undefined>(undefined);
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Record<string, unknown>) {}
+  private readonly isTransitioningState = signal(false);
+  protected readonly isTransitioning = this.isTransitioningState.asReadonly();
 
-  ngOnChanges(changes: SimpleChanges) {
-    // We only need to do something here if the slot changes
-    const changedSlot = (changes as unknown as NgxTransitionContentComponent).slot as unknown as SimpleChange;
-    if (changedSlot === undefined) return;
+  private readonly timers: ReturnType<typeof setTimeout>[] = [];
+  private readonly platformId = inject(PLATFORM_ID);
+  private hasInitializedSlot = false;
 
-    // Ignore the first entry animation
-    if (changedSlot.firstChange) {
-      // We can't use requestAnimationFrame during SSR.
-      if (!isPlatformBrowser(this.platformId)) return;
+  protected readonly activeTemplate = computed(() => this.getTemplate(this.activeSlot()));
 
-      // This needs to be called delayed so the entry "animation"
-      // can complete.
-      requestAnimationFrame(() => {
-        this.isLoaded = true;
+  protected readonly leavingTemplate = computed(() => {
+    const slot = this.leavingSlot();
+    return slot === undefined ? null : this.getTemplate(slot);
+  });
+
+  protected readonly delayEnter = computed(() => this.durationFade() + this.durationHeight());
+
+  private readonly syncSlot = effect(
+    (onCleanup) => {
+      onCleanup(() => this.clearTimers());
+
+      const nextSlot = this.slot();
+      untracked(() => {
+        if (!this.hasInitializedSlot) {
+          this.activeSlot.set(nextSlot);
+          this.hasInitializedSlot = true;
+          return;
+        }
+
+        this.startTransition(nextSlot);
       });
+    },
+    { debugName: "NgxTransitionContentComponent.syncSlot" },
+  );
+
+  public startTransition(nextSlot = this.slot()) {
+    if (this.activeSlot() === nextSlot) {
       return;
     }
 
-    // Whenever the slot changes, animate the transition
-    this.startTransition();
-  }
-
-  public onEnterDone(evt: AnimationEvent) {
-    // This fires multiple times, we're only interested in the one where it's in the correct state
-    if (evt.toState === ":enter") {
-      // New content has completely entered the DOM and is visible.
-      // The height also perfectly matches the new content, so we can restore the height to auto.
-      this.height = undefined;
-      this.width = undefined;
+    if (!isPlatformBrowser(this.platformId)) {
+      this.activeSlot.set(nextSlot);
+      return;
     }
+
+    this.clearTimers();
+
+    this.heightState.set(this.wrapperHeight()?.nativeElement.clientHeight);
+    this.widthState.set(this.wrapperWidth()?.nativeElement.clientWidth);
+    this.leavingSlot.set(this.activeSlot());
+    this.activeSlot.set(nextSlot);
+    this.isTransitioningState.set(true);
+
+    this.schedule(() => {
+      this.heightState.set(this.wrapperHeight()?.nativeElement.clientHeight);
+      this.widthState.set(this.wrapperWidth()?.nativeElement.clientWidth);
+    }, this.durationFade());
+
+    this.schedule(
+      () => {
+        this.heightState.set(undefined);
+        this.widthState.set(undefined);
+        this.leavingSlot.set(undefined);
+        this.isTransitioningState.set(false);
+      },
+      this.durationFade() + this.durationHeight() + this.durationFade(),
+    );
   }
-  public onLeaveDone(evt: AnimationEvent) {
-    // This fires multiple times, we're only interested in the one where it's in the correct state
-    if (evt.toState === "void") {
-      // Old content has completely left the DOM and the new content
-      // already takes up space in the DOM (even though it's not visible yet due to the animation delay).
-      // This transitions the height to the new content's height.
-      this.height = this.wrapperHeight?.nativeElement.clientHeight;
-      this.width = this.wrapperWidth?.nativeElement.clientWidth;
+
+  private getTemplate(slot: number): TemplateRef<unknown> | null {
+    return this.templates()[slot] ?? null;
+  }
+
+  private schedule(callback: () => void, delay: number) {
+    const timeout = setTimeout(
+      () => {
+        callback();
+      },
+      Math.max(0, delay),
+    );
+    this.timers.push(timeout);
+  }
+
+  private clearTimers() {
+    for (const timer of this.timers) {
+      clearTimeout(timer);
     }
-  }
 
-  /**
-   * Save the current height and switch out the content
-   */
-  async startTransition() {
-    // Save the current height of the content element
-    // This is necessary to enable a smooth transition between different height values
-    this.height = this.wrapperHeight?.nativeElement.clientHeight;
-    this.width = this.wrapperWidth?.nativeElement.clientWidth;
-
-    // Change the rendered slot after the height has been measured/saved
-    this.activeSlot = this.slot;
+    this.timers.length = 0;
   }
 }
