@@ -9,20 +9,17 @@
   <div class="wrapperHeight" #wrapperHeight>
     <!-- Used to measure width. Due to browser layout timing, width is measured on its own wrapper. -->
     <div class="wrapperWidth" #wrapperWidth>
-      @if (leavingTemplate(); as tmpl) {
-        <div class="page page--leaving" [style.--ngx-transition-content-fade-duration]="durationFade() + 'ms'">
-          <ng-container [ngTemplateOutlet]="tmpl"></ng-container>
-        </div>
-      }
-
-      @if (activeTemplate(); as tmpl) {
+      @for (renderedPage of renderedPages(); track renderedPage.page) {
         <div
           class="page"
-          [class.page--entering]="isTransitioning()"
+          [class.page--hidden]="activeSlot() !== renderedPage.slot && leavingSlot() !== renderedPage.slot"
+          [class.page--leaving]="leavingSlot() === renderedPage.slot"
+          [class.page--entering]="isTransitioning() && activeSlot() === renderedPage.slot"
+          [attr.aria-hidden]="activeSlot() === renderedPage.slot ? null : 'true'"
           [style.--ngx-transition-content-fade-duration]="durationFade() + 'ms'"
           [style.--ngx-transition-content-enter-delay]="delayEnter() + 'ms'"
         >
-          <ng-container [ngTemplateOutlet]="tmpl"></ng-container>
+          <ng-container [ngTemplateOutlet]="renderedPage.page.template"></ng-container>
         </div>
       }
     </div>

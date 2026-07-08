@@ -25,6 +25,16 @@
   display: block;
 }
 
+.page--hidden {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  width: 100%;
+  visibility: hidden;
+  pointer-events: none;
+}
+
 .page--leaving {
   position: absolute;
   top: 0;
