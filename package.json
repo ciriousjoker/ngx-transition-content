@@ -1,7 +1,7 @@
 {
   "name": "ngx-transition-content",
   "description": "Switch between content: fade out, transition dimensions, fade in",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "private": true,
   "packageManager": "pnpm@11.10.0",
   "engines": {

@@ -1,3 +1,8 @@
+## [2.1.0] - 2026-07-08
+
+- Add `keepViewsAlive` to keep all transition pages mounted while inactive.
+- Add `keepAlive` to keep individual transition pages mounted while inactive.
+
 ## [2.0.0] - 2026-07-06
 
 - Require Angular >=20.2.0.
