@@ -4,6 +4,10 @@ on:
   release:
     types: [created]
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   publish-npm:
     runs-on: ubuntu-latest
@@ -14,6 +18,7 @@ jobs:
           registry-url: https://registry.npmjs.org/
       - run: pnpm run test
       - run: pnpm run pack:dry-run
-      - run: pnpm --dir ./dist/ngx-transition-content publish --no-git-checks
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
+      - run: npm install --global npm@11
+      - run: npm --version
+      - run: npm publish
+        working-directory: ./dist/ngx-transition-content
