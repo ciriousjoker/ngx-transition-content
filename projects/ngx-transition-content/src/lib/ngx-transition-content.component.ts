@@ -1,5 +1,6 @@
 import { CommonModule, isPlatformBrowser } from "@angular/common";
 import {
+  booleanAttribute,
   computed,
   Component,
   contentChildren,
@@ -25,7 +26,17 @@ const defaultDurationHeight = 300;
   selector: "[ngx-transition-content-page]",
   standalone: true,
 })
-export class NgxTransitionContentPage {}
+export class NgxTransitionContentPage {
+  /** Whether this page should stay mounted while inactive. */
+  public readonly keepAlive = input(false, { transform: booleanAttribute });
+
+  public readonly template = inject(TemplateRef<unknown>);
+}
+
+interface RenderedPage {
+  page: NgxTransitionContentPage;
+  slot: number;
+}
 
 /**
  * Transition between content elements.
@@ -45,7 +56,7 @@ export class NgxTransitionContentPage {}
 })
 export class NgxTransitionContentComponent {
   /** A list of templates that should be transitioned between. */
-  protected readonly templates = contentChildren(NgxTransitionContentPage, { read: TemplateRef });
+  protected readonly pages = contentChildren(NgxTransitionContentPage);
 
   /** A wrapper around the content. It is used to measure the height that the content takes up. */
   protected readonly wrapperHeight = viewChild<ElementRef<HTMLElement>>("wrapperHeight");
@@ -62,6 +73,9 @@ export class NgxTransitionContentComponent {
   /** Dimension transition duration in milliseconds. */
   public readonly durationHeight = input(defaultDurationHeight);
 
+  /** Whether all views should stay mounted while inactive. */
+  public readonly keepViewsAlive = input(false, { transform: booleanAttribute });
+
   /** undefined means auto, otherwise number in pixels. */
   private readonly heightState = signal<number | undefined>(undefined);
   protected readonly height = this.heightState.asReadonly();
@@ -71,10 +85,10 @@ export class NgxTransitionContentComponent {
   protected readonly width = this.widthState.asReadonly();
 
   /** We use a proxy property because dimensions must be measured before switching content. */
-  private readonly activeSlot = signal(this.slot());
+  protected readonly activeSlot = signal(this.slot());
 
   /** The previous slot stays mounted while it fades out. */
-  private readonly leavingSlot = signal<number | undefined>(undefined);
+  protected readonly leavingSlot = signal<number | undefined>(undefined);
 
   private readonly isTransitioningState = signal(false);
   protected readonly isTransitioning = this.isTransitioningState.asReadonly();
@@ -83,11 +97,14 @@ export class NgxTransitionContentComponent {
   private readonly platformId = inject(PLATFORM_ID);
   private hasInitializedSlot = false;
 
-  protected readonly activeTemplate = computed(() => this.getTemplate(this.activeSlot()));
+  protected readonly renderedPages = computed<RenderedPage[]>(() => {
+    const activeSlot = this.activeSlot();
+    const leavingSlot = this.leavingSlot();
+    const keepViewsAlive = this.keepViewsAlive();
 
-  protected readonly leavingTemplate = computed(() => {
-    const slot = this.leavingSlot();
-    return slot === undefined ? null : this.getTemplate(slot);
+    return this.pages()
+      .map((page, slot) => ({ page, slot }))
+      .filter(({ page, slot }) => slot === activeSlot || slot === leavingSlot || keepViewsAlive || page.keepAlive());
   });
 
   protected readonly delayEnter = computed(() => this.durationFade() + this.durationHeight());
@@ -142,10 +159,6 @@ export class NgxTransitionContentComponent {
       },
       this.durationFade() + this.durationHeight() + this.durationFade(),
     );
-  }
-
-  private getTemplate(slot: number): TemplateRef<unknown> | null {
-    return this.templates()[slot] ?? null;
   }
 
   private schedule(callback: () => void, delay: number) {

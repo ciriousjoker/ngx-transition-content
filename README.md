@@ -42,6 +42,7 @@ export class DialogComponent {
   Optional attributes:
     [durationFade]="300"
     [durationHeight]="300"
+    [keepViewsAlive]="false"
 -->
 <ngx-transition-content [slot]="slot">
   <ng-template ngx-transition-content-page>
@@ -59,5 +60,37 @@ export class DialogComponent {
   </ng-template>
 </ngx-transition-content>
 ```
+
+By default, inactive pages are destroyed after the transition finishes. This keeps the component lightweight.
+
+Use `keepViewsAlive` when every page should stay mounted while inactive:
+
+```html
+<ngx-transition-content [slot]="slot" keepViewsAlive>
+  <ng-template ngx-transition-content-page>
+    <app-login-form />
+  </ng-template>
+
+  <ng-template ngx-transition-content-page>
+    <app-register-form />
+  </ng-template>
+</ngx-transition-content>
+```
+
+Use `keepAlive` on a single page when only that page needs to stay mounted while inactive:
+
+```html
+<ngx-transition-content [slot]="slot">
+  <ng-template ngx-transition-content-page>
+    <app-login-form />
+  </ng-template>
+
+  <ng-template ngx-transition-content-page keepAlive>
+    <app-register-form />
+  </ng-template>
+</ngx-transition-content>
+```
+
+This is useful for content with internal mount animations or stateful controls that should not be recreated when the page becomes visible.
 
 NgModule consumers can still import `NgxTransitionContentModule`.
